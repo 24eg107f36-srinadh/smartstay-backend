@@ -1,0 +1,16 @@
+com\smartstay\backend\controller\PasswordTestController.class
+com\smartstay\backend\BackendApplication.class
+com\smartstay\backend\entity\User$Role.class
+com\smartstay\backend\controller\RegisterRequest.class
+com\smartstay\backend\repository\UserRepository.class
+com\smartstay\backend\security\JwtAuthenticationFilter.class
+com\smartstay\backend\entity\User.class
+com\smartstay\backend\controller\TestController.class
+com\smartstay\backend\config\SecurityConfig.class
+com\smartstay\backend\service\ForgotPasswordService.class
+com\smartstay\backend\service\EmailService.class
+com\smartstay\backend\controller\AuthController.class
+com\smartstay\backend\service\OtpService.class
+com\smartstay\backend\controller\AuthResponse.class
+com\smartstay\backend\controller\LoginRequest.class
+com\smartstay\backend\security\JwtService.class
