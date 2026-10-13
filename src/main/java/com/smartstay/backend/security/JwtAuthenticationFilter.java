@@ -1,7 +1,6 @@
 
 package com.smartstay.backend.security;
 
-import com.smartstay.backend.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -31,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
 
         return path.startsWith("/api/auth/")
+                || "/api/health".equals(path)
                 || "OPTIONS".equalsIgnoreCase(request.getMethod());
     }
 
