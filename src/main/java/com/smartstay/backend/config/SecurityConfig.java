@@ -1,3 +1,4 @@
+
 package com.smartstay.backend.config;
 
 import com.smartstay.backend.security.JwtAuthenticationFilter;
@@ -20,65 +21,83 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-}
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
-@Bean
-public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-@Bean
-public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
-    configuration.setAllowedOrigins(List.of(
-            "http://localhost:5173",
-            "https://vermillion-beignet-e1d16a.netlify.app"
-    ));
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://vermillion-beignet-e1d16a.netlify.app"
+        ));
 
-    configuration.setAllowedMethods(List.of(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS"
-    ));
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
 
-    configuration.setAllowedHeaders(List.of("*"));
-    configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin"
+        ));
 
-    UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+        configuration.setAllowCredentials(true);
 
-    source.registerCorsConfiguration("/**", configuration);
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
 
-    return source;
-}
+        source.registerCorsConfiguration("/**", configuration);
 
-@Bean
-public SecurityFilterChain securityFilterChain(
-        HttpSecurity http) throws Exception {
+        return source;
+    }
 
-    http
-        .cors(cors -> {})
-        .csrf(csrf -> csrf.disable())
-        .sessionManagement(session ->
-            session.sessionCreationPolicy(
-                SessionCreationPolicy.STATELESS
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
+
+        http
+            .cors(cors -> {})
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session ->
+                    session.sessionCreationPolicy(
+                            SessionCreationPolicy.STATELESS
+                    )
             )
-        )
-        .authorizeHttpRequests(auth -> auth
-            .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers("/api/health").permitAll()
-            .requestMatchers("/api/auth/**", "/error").permitAll()
-            .anyRequest().authenticated()
-        )
-        .addFilterBefore(
-            jwtAuthenticationFilter,
-            UsernamePasswordAuthenticationFilter.class
-        );
+            .authorizeHttpRequests(auth -> auth
+                    // Permit error dispatches so errors aren't masked by 403.
+                    .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
 
-    return http.build();
-}
+                    // Browser preflight requests.
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                    // Public endpoints.
+                    .requestMatchers(
+                            "/api/health",
+                            "/api/health/**",
+                            "/api/auth",
+                            "/api/auth/**",
+                            "/error"
+                    ).permitAll()
+
+                    // Everything else still requires authentication.
+                    .anyRequest().authenticated()
+            )
+            .addFilterBefore(
+                    jwtAuthenticationFilter,
+                    UsernamePasswordAuthenticationFilter.class
+            );
+
+        return http.build();
+    }
 }
