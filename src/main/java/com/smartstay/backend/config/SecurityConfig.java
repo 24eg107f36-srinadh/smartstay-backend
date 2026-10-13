@@ -70,7 +70,11 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**", "/api/health").permitAll()
+                .requestMatchers(
+    "/api/auth/**",
+    "/api/health",
+    "/error"
+).permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(
