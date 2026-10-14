@@ -1,4 +1,4 @@
-
+-
 package com.smartstay.backend.config;
 
 import com.smartstay.backend.security.JwtAuthenticationFilter;
@@ -35,9 +35,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:5173"
-        ));
+	configuration.setAllowedOrigins(List.of(
+        	"http://localhost:5173",
+        	"https://vermillion-beignet-e1d16a.netlify.app"
+));
 
         configuration.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS"
@@ -66,11 +67,13 @@ public class SecurityConfig {
                     SessionCreationPolicy.STATELESS
                 )
             )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated()
-            )
+          .authorizeHttpRequests(auth -> auth
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+    .requestMatchers("/", "/error", "/api/health", "/api/health/**").permitAll()
+    .requestMatchers("/api/auth/**").permitAll()
+    .anyRequest().authenticated()
+)
+            
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
