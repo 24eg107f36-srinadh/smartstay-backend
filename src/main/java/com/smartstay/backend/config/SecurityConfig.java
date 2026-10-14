@@ -70,18 +70,12 @@ public class SecurityConfig {
                 )
             )
             .authorizeHttpRequests(auth -> auth
-                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(
-                    "/",
-                    "/error",
-                    "/api/health",
-                    "/api/health/**",
-                    "/api/auth",
-                    "/api/auth/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+    .requestMatchers("/api/health", "/api/health/**").permitAll()
+    .requestMatchers("/api/auth/**").permitAll()
+    .anyRequest().authenticated()
+)
+            
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
