@@ -42,14 +42,13 @@ public class SecurityConfig {
         ));
 
         configuration.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+                "GET", "POST", "PUT", "PATCH",
+                "DELETE", "OPTIONS"
         ));
 
         configuration.setAllowedHeaders(List.of(
-                "Authorization",
-                "Content-Type",
-                "Accept",
-                "Origin"
+                "Authorization", "Content-Type",
+                "Accept", "Origin"
         ));
 
         configuration.setAllowCredentials(true);
@@ -67,36 +66,39 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
-            .cors(cors -> {})
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session ->
-                    session.sessionCreationPolicy(
-                            SessionCreationPolicy.STATELESS
-                    )
-            )
-            .authorizeHttpRequests(auth -> auth
-                    // Permit error dispatches so errors aren't masked by 403.
-                    .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                .cors(cors -> {})
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(
+                                DispatcherType.ERROR
+                        ).permitAll()
 
-                    // Browser preflight requests.
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(
+                                HttpMethod.OPTIONS, "/**"
+                        ).permitAll()
 
-                    // Public endpoints.
-                    .requestMatchers(
-                            "/api/health",
-                            "/api/health/**",
-                            "/api/auth",
-                            "/api/auth/**",
-                            "/error"
-                    ).permitAll()
+                        // Public endpoints
+                        .requestMatchers(
+                                "/",
+                                "/error",
+                                "/api/health",
+                                "/api/health/**",
+                                "/api/auth",
+                                "/api/auth/**"
+                        ).permitAll()
 
-                    // Everything else still requires authentication.
-                    .anyRequest().authenticated()
-            )
-            .addFilterBefore(
-                    jwtAuthenticationFilter,
-                    UsernamePasswordAuthenticationFilter.class
-            );
+                        // All other endpoints require authentication
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
